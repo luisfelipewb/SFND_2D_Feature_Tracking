@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <deque>
 #include <cmath>
 #include <limits>
 #include <opencv2/core.hpp>
@@ -37,7 +38,7 @@ int main(int argc, const char *argv[])
 
     // misc
     int dataBufferSize = 2;       // no. of images which are held in memory (ring buffer) at the same time
-    vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
+    deque<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
     bool bVis = false;            // visualize results
 
     /* MAIN LOOP OVER ALL IMAGES */
@@ -63,6 +64,10 @@ int main(int argc, const char *argv[])
         DataFrame frame;
         frame.cameraImg = imgGray;
         dataBuffer.push_back(frame);
+        if (dataBuffer.size() > dataBufferSize)
+        {
+            dataBuffer.pop_front();
+        }
 
         //// EOF STUDENT ASSIGNMENT
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
