@@ -45,6 +45,31 @@ int main(int argc, const char *argv[])
     if (csvOutput)
         cout << "ImgNum,KptDetector,TotalNumOfKpts,DetectionTime,NumrOfKptsInROI,DescriptorType,ExtractionTime,Matcher,Selector,NumOfMatches,MatchingTime" << endl;
 
+    // Loop over each possible combination of detector and descriptor types
+    vector<string> detectorTypes = {"SHITOMASI", "HARRIS", "FAST", "BRISK", "ORB", "AKAZE", "SIFT"};
+    vector<string> descriptorTypes = {"BRISK", "BRIEF", "ORB", "FREAK", "AKAZE", "SIFT"};
+    string detectorType;
+    string descriptorType;
+
+    for (auto detIt = detectorTypes.begin(); detIt != detectorTypes.end(); detIt++)
+    {
+        for (auto descIt = descriptorTypes.begin(); descIt != descriptorTypes.end(); descIt++)
+        {
+            detectorType = *detIt;
+            descriptorType = *descIt;
+            // Skip combinations that are not possbile.
+            if ((descriptorType.compare("AKAZE") == 0) && (detectorType.compare("AKAZE") != 0))
+            {
+                cout << "Detector " << detectorType << " is not compatible with descriptor " << descriptorType << endl;
+                continue;
+            }
+            if ((descriptorType.compare("ORB") == 0) && (detectorType.compare("SIFT") == 0))
+            {
+                cout << "Detector " << detectorType << " is not compatible with descriptor " << descriptorType << endl;
+                continue;
+            }
+            cout << "Evaluate detector " << detectorType << " and descriptor " << descriptorType << endl;
+
     /* MAIN LOOP OVER ALL IMAGES */
 
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
@@ -82,7 +107,7 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints; // create empty feature list for current image
-        string detectorType = "SHITOMASI";
+        //string detectorType = "SHITOMASI";
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
@@ -155,7 +180,7 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
+        //string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
@@ -215,6 +240,10 @@ int main(int argc, const char *argv[])
                     cout << endl;
 
     } // eof loop over all images
+    // Cleanup dataBuffer before testing new combination of detector and descriptor
+    dataBuffer.erase(dataBuffer.begin(), dataBuffer.end());
+            }
+    }
 
     return 0;
 }
